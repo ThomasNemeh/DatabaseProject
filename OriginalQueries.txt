@@ -1,0 +1,58 @@
+SELECT AVG(dailySalary) AS 'Average Female Salary'
+FROM Participant
+WHERE gender='F';
+
+Select C.idCoach as 'Coach ID', COUNT(S.idCoach) as '# Participants Coached'
+FROM ( Coach C LEFT OUTER JOIN
+       Contender AS S
+       ON C.idCoach=S.idCoach) 
+GROUP BY C.idCoach;
+
+Select a.idCoach as 'Coach ID', a.num AS 'March Show Attendance', b.num AS 'April Show Attendance'
+From (Select C.idCoach, COUNT(S.idCoach) AS num
+      FROM ( Coach C LEFT OUTER JOIN
+       CoachInShow S
+       ON C.idCoach=S.idCoach AND S.idShow IN (Select idShow FROM TVShow WHERE airDate LIKE '______3%')) 
+       GROUP BY C.idCoach) a,
+       (Select Y.idCoach, COUNT(Z.idCoach) as num
+        FROM ( Coach Y LEFT OUTER JOIN
+        CoachInShow Z
+        ON Y.idCoach=Z.idCoach AND Z.idShow IN (Select idShow FROM TVShow WHERE airDate LIKE '______4%')) 
+        GROUP BY Y.idCoach) b
+WHERE a.idCoach = b.idCoach;
+
+Select C.stageName AS 'Most Expensive Contender'
+FROM Contender C, (Select S.idContender, SUM(P.dailySalary) AS salary
+                    FROM Participant P, Contender S
+                    WHERE P.idContender = S.idContender
+                    GROUP BY S.idContender) x
+WHERE salary = (Select MAX(salary) FROM (Select S.idContender, SUM(P.dailySalary) AS salary
+                    FROM Participant P, Contender S
+                    WHERE P.idContender = S.idContender
+                    GROUP BY S.idContender) y) AND C.idContender = x.idContender;
+                    
+(Select C.name as 'Name', a.num AS 'March Show Attendance', C.dailySalary as 'Daily Salary', a.num * C.dailySalary as 'March Total Salary'
+From coach C, (Select C.idCoach, COUNT(S.idCoach) AS num
+      FROM ( Coach C LEFT OUTER JOIN
+       CoachInShow S
+       ON C.idCoach=S.idCoach AND S.idShow IN (Select idShow FROM TVShow WHERE airDate LIKE '______3%')) 
+       GROUP BY C.idCoach) a
+WHERE C.idCoach = a.idCoach)
+UNION
+(Select C.name as 'Name', a.num AS 'March Show Attendance', C.dailySalary as 'Daily Salary', a.num * C.dailySalary as 'March Total Salary'
+From participant C, 
+       (Select C.idParticipant, COUNT(S.idContender) AS num
+       FROM ( participant C LEFT OUTER JOIN
+       ContenderInShow S
+       ON C.idContender=S.idContender AND S.idShow IN (Select idShow FROM TVShow WHERE airDate LIKE '______3%')) 
+       GROUP BY C.idParticipant) a
+WHERE C.idParticipant = a.idParticipant);
+
+SELECT CASE WHEN EXISTS
+  (SELECT *
+   FROM Contender C
+   WHERE (SELECT COUNT(*) FROM Participant P WHERE P.idContender = C.idContender ) = 1
+   AND C.type = 'G'
+  )
+THEN 'FALSE' ELSE 'TRUE' END AS 'Group Constraint Satisfied';
+

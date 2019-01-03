@@ -1,0 +1,2 @@
+DELETE FROM Contender
+WHERE idContender = 'B4444';

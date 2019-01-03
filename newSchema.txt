@@ -1,0 +1,225 @@
+CREATE TABLE Coach (
+  idCoach VARCHAR(5) UNIQUE NOT NULL CHECK (idCoach LIKE 'A%'),
+  name VARCHAR(20) NOT NULL,
+  surname VARCHAR(20) NOT NULL,
+  DoB Date Not Null,
+  phone VARCHAR(20) NOT NULL,
+  gender CHAR(1) NOT NULL CHECK (gender IN ('M','F')),
+  hourlySalary FLOAT(8,2) UNSIGNED,
+  PRIMARY KEY (idCoach)
+); 
+
+CREATE TABLE Contender (
+  idContender VARCHAR(5) UNIQUE NOT NULL CHECK (idCoach LIKE 'B%'),
+  stageName VARCHAR(30) NOT NULL,
+  type CHAR(1) NOT NULL CHECK (type IN ('G', 'I')),
+  idCoach VARCHAR(5) CHECK (idCoach LIKE 'A%'),
+  PRIMARY KEY (idContender),
+  
+  FOREIGN KEY (idCoach)
+    REFERENCES Coach(idCoach)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+);
+
+CREATE TABLE Participant (
+  idParticipant VARCHAR(5) UNIQUE NOT NULL CHECK (idCoach LIKE 'C%'),
+  name VARCHAR(20) NOT NULL,
+  surname VARCHAR(20) NOT NULL,
+  DoB Date Not Null,
+  phone VARCHAR(20) NOT NULL,
+  gender CHAR(1) NOT NULL CHECK (gender IN ('M','F')),
+  hourlySalary FLOAT(8,2) UNSIGNED,
+  idContender VARCHAR(5) NOT NULL CHECK (idContender LIKE 'B%'),
+  PRIMARY KEY (idParticipant),
+  
+  FOREIGN KEY (idContender)
+    REFERENCES Contender(idContender)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+); 
+
+CREATE TABLE TVShow (
+  idShow VARCHAR(5) UNIQUE NOT NULL CHECK (idCoach LIKE 'D%'),
+  airDate Date Not Null,
+  startTime TIME Not NULL,
+  endTime TIME Not NULL,
+  location VARCHAR(30) DEFAULT 'Television Studio',
+  PRIMARY KEY (idShow)
+); 
+
+CREATE TABLE CoachInShow (
+  idCoach VARCHAR(5) NOT NULL CHECK (idCoach LIKE 'A%'),
+  idShow VARCHAR(5) NOT NULL CHECK (idShow LIKE 'D%'),
+  arrivalTime TIME NOT NULL,
+  departureTime TIME NOT NULL,
+  
+  FOREIGN KEY (idCoach)
+    REFERENCES Coach(idCoach)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  
+  FOREIGN KEY (idShow)
+    REFERENCES TVShow(idShow)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+ );
+ 
+ CREATE TABLE ContenderInShow (
+  idContender VARCHAR(5) NOT NULL CHECK (idContender LIKE 'B%'),
+  idShow VARCHAR(5) NOT NULL CHECK (idShow LIKE 'D%'),
+  arrivalTime TIME NOT NULL,
+  departureTime TIME NOT NULL,
+  
+  FOREIGN KEY (idContender)
+    REFERENCES Contender(idContender)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  
+  FOREIGN KEY (idShow)
+    REFERENCES TVShow(idShow)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+ );
+ 
+ insert into Coach values 
+  ('A0000','Elvis','Presley', '1915-01-09','07519 421949', 'M', 50000.00),
+  ('A1111','Frank','Sinatra', '1930-05-21','09769 784347', 'M', 45000.00),
+  ('A2222','Billie','Holiday', '1943-02-14','08469 784912', 'F', 32500.00),
+  ('A3333', 'Brock', 'Vond', '1951-12-12', '092273 092483', 'M', 200.00);
+ 
+ insert into Contender values
+  ('B0000', 'Lovers', 'G', 'A1111'), 
+  ('B1111', 'Amputee', 'I', 'A0000'),
+  ('B2222', 'Primitive Mammal', 'I', 'A2222'),
+  ('B3333', 'Unseen Power', 'I', 'A2222'),
+  ('B4444', 'Head of the Russian Department', 'I', 'A1111'),
+  ('B5555', 'Visitation', 'I', 'A2222');
+ 
+ insert into Participant values 
+ ('C0000','Bob','Slocum', '1915-01-09','07519 421949', 'M', 5000.00, 'B2222'),
+ ('C1111','Bigfoot','Bjornsen', '1988-05-21','09769 784347', 'M', 4500.00, 'B3333'),
+ ('C2222','Benny','Profane', '1983-04-14','08469 784912', 'M', 3250.00, 'B0000'),
+ ('C3333','Holly','Belle', '1971-02-11','07519 120949', 'F', 1200.00, 'B5555'),
+ ('C4444','Aunt','Maude', '1981-05-21','05439 904347', 'F', 4500.00, 'B0000'),
+ ('C5555','Blaise','Cendrars', '1912-06-18','08469 890947', 'M', 10000.00, 'B1111'),
+ ('C6666','Humbert','Humbert', '1918-03-11','02398 634947', 'M', 12000.00, 'B0000'),
+ ('C7777','Dolores','Haze', '1967-11-12','089482 069362', 'F', 3250.00, 'B0000'),
+ ('C8888','Rachel','Owlglass', '1939-02-14','009173 018920', 'F', 7000.00, 'B0000'),
+ ('C9999','Timofey Pavlovich','Pnin', '1919-08-27','028392 091627', 'M', 200.01, 'B4444');
+   
+ insert into TVShow values
+ ('D0000', '2017-03-1', '14:00', '16:00', 'Grand Canyon'),
+ ('D1111', '2017-03-2', '16:00', '18:00', DEFAULT),
+ ('D2222', '2017-03-8', '15:00', '17:00', DEFAULT),
+ ('D3333', '2017-03-9', '12:00', '14:00', 'Death Valley'),
+ ('D4444', '2017-03-15', '12:00', '14:00', DEFAULT),
+ ('D5555', '2017-03-16', '19:00', '21:00', DEFAULT),
+ ('D6666', '2017-03-22', '12:00', '14:00', DEFAULT),
+ ('D7777', '2017-03-23', '12:00', '14:00', DEFAULT),
+ ('D8888', '2017-03-29', '12:00', '14:00', 'Mongolian Steppe'),
+ ('D9999', '2017-03-30', '20:00', '22:00', DEFAULT),
+ ('D0111', '2017-04-04', '12:00', '14:00', DEFAULT),
+ ('D0222', '2017-04-05', '14:00', '16:00', 'Mt. Kilimanjaro'),
+ ('D0333', '2017-04-11', '12:00', '14:00', DEFAULT),
+ ('D0444', '2017-04-12', '13:00', '15:00', DEFAULT),
+ ('D0555', '2017-04-18', '18:00', '20:00', 'International Space Station'),
+ ('D0666', '2017-04-19', '12:00', '14:00', DEFAULT),
+ ('D0777', '2017-04-25', '13:00', '15:00', 'The Ritz'),
+ ('D0888', '2017-04-26', '12:00', '14:00', 'The Moon');
+ 
+ insert into ContenderInShow values
+   ('B0000', 'D0000', '13:00', '17:00'),
+   ('B1111', 'D0000', '13:00', '17:00'),
+   ('B2222', 'D0000', '13:00', '17:00'),
+   ('B3333', 'D1111', '15:00', '19:00'),
+   ('B4444', 'D1111', '15:00', '19:00'),
+   ('B5555', 'D1111', '15:00', '19:00'),
+   ('B0000', 'D2222', '14:00', '18:00'),
+   ('B1111', 'D2222', '14:00', '18:00'),
+   ('B2222', 'D2222', '14:00', '18:00'),
+   ('B3333', 'D3333', '11:00', '15:00'),
+   ('B4444', 'D3333', '11:00', '15:00'),
+   ('B5555', 'D3333', '11:00', '15:00'),
+   ('B0000', 'D4444', '11:00', '15:00'),
+   ('B1111', 'D4444', '11:00', '15:00'),
+   ('B2222', 'D4444', '11:00', '15:00'),
+   ('B3333', 'D5555', '18:00', '22:00'),
+   ('B4444', 'D5555', '18:00', '22:00'),
+   ('B5555', 'D5555', '18:00', '22:00'),
+   ('B0000', 'D6666', '11:00', '15:00'),
+   ('B1111', 'D6666', '11:00', '15:00'),
+   ('B2222', 'D6666', '11:00', '15:00'),
+   ('B3333', 'D7777', '11:00', '15:00'),
+   ('B4444', 'D7777', '11:00', '15:00'),
+   ('B5555', 'D7777', '11:00', '15:00'),
+   ('B0000', 'D8888', '11:00', '15:00'),
+   ('B1111', 'D8888', '11:00', '15:00'),
+   ('B2222', 'D8888', '11:00', '15:00'),
+   ('B3333', 'D9999', '19:00', '23:00'),
+   ('B4444', 'D9999', '19:00', '23:00'),
+   ('B5555', 'D9999', '19:00', '23:00'),
+   ('B0000', 'D0111', '11:00', '15:00'),
+   ('B1111', 'D0111', '11:00', '15:00'),
+   ('B2222', 'D0111', '11:00', '15:00'),
+   ('B3333', 'D0222', '13:00', '17:00'),
+   ('B4444', 'D0222', '13:00', '17:00'),
+   ('B5555', 'D0222', '13:00', '17:00'),
+   ('B0000', 'D0333', '11:00', '15:00'),
+   ('B1111', 'D0333', '11:00', '15:00'),
+   ('B2222', 'D0333', '11:00', '15:00'),
+   ('B3333', 'D0444', '12:00', '16:00'),
+   ('B4444', 'D0444', '12:00', '16:00'),
+   ('B5555', 'D0444', '12:00', '16:00'),
+   ('B0000', 'D0555', '17:00', '21:00'),
+   ('B1111', 'D0555', '17:00', '21:00'),
+   ('B2222', 'D0555', '17:00', '21:00'),
+   ('B3333', 'D0666', '11:00', '15:00'),
+   ('B4444', 'D0666', '11:00', '15:00'),
+   ('B5555', 'D0666', '11:00', '15:00'),
+   ('B0000', 'D0777', '12:00', '16:00'),
+   ('B1111', 'D0777', '12:00', '16:00'),
+   ('B2222', 'D0777', '12:00', '16:00'),
+   ('B3333', 'D0888', '11:00', '15:00'),
+   ('B4444', 'D0888', '11:00', '15:00'),
+   ('B5555', 'D0888', '11:00', '15:00');
+   
+   insert into CoachInShow values
+     ('A0000', 'D0000', '13:00', '17:00'),
+     ('A2222', 'D0000', '13:00', '17:00'),
+     ('A1111', 'D1111', '15:00', '19:00'),
+     ('A2222', 'D1111', '15:00', '19:00'),
+     ('A0000', 'D2222', '14:00', '18:00'),
+     ('A2222', 'D2222', '14:00', '18:00'),
+     ('A1111', 'D3333', '11:00', '15:00'),
+     ('A2222', 'D3333', '11:00', '15:00'),
+     ('A0000', 'D4444', '11:00', '15:00'),
+     ('A2222', 'D4444', '11:00', '15:00'),
+     ('A1111', 'D5555', '18:00', '22:00'),
+     ('A2222', 'D5555', '18:00', '22:00'),
+     ('A0000', 'D5555', '18:00', '22:00'),
+     ('A2222', 'D6666', '11:00', '15:00'),
+     ('A1111', 'D6666', '11:00', '15:00'),
+     ('A2222', 'D7777', '11:00', '15:00'),
+     ('A0000', 'D7777', '11:00', '15:00'),
+     ('A2222', 'D8888', '11:00', '15:00'),
+     ('A2222', 'D8888', '11:00', '15:00'),
+     ('A1111', 'D9999', '19:00', '23:00'),
+     ('A1111', 'D9999', '19:00', '23:00'),
+     ('A2222', 'D0111', '11:00', '15:00'),
+     ('A2222', 'D0111', '11:00', '15:00'),
+     ('A0000', 'D0222', '13:00', '17:00'),
+     ('A2222', 'D0222', '13:00', '17:00'),
+     ('A1111', 'D0333', '11:00', '15:00'),
+     ('A1111', 'D0333', '11:00', '15:00'),
+     ('A2222', 'D0444', '12:00', '16:00'),
+     ('A2222', 'D0444', '12:00', '16:00'),
+     ('A0000', 'D0555', '17:00', '21:00'),
+     ('A2222', 'D0555', '17:00', '21:00'),
+     ('A1111', 'D0666', '11:00', '15:00'),
+     ('A1111', 'D0666', '11:00', '15:00'),
+     ('A2222', 'D0777', '12:00', '16:00'),
+     ('A0000', 'D0777', '12:00', '16:00'),
+     ('A2222', 'D0888', '11:00', '15:00'),
+     ('A1111', 'D0888', '11:00', '15:00');
+     
